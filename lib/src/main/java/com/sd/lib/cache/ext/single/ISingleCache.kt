@@ -19,5 +19,5 @@ interface ISingleCache<T> {
     /**
      * 修改
      */
-    fun modify(block: (cache: T) -> Unit): T?
+    fun modify(block: (cache: T) -> T): T?
 }
