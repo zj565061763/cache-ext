@@ -15,7 +15,7 @@ abstract class FlowSingleCache<T>(clazz: Class<T>) : SingleCache<T>(clazz) {
     private val _readonlyFlow by lazy {
         synchronized(clazz) {
             if (_flow.replayCache.isEmpty()) {
-                syncFlow()
+                syncFlowIfEmpty()
             }
         }
         _flow.asSharedFlow()
@@ -27,7 +27,7 @@ abstract class FlowSingleCache<T>(clazz: Class<T>) : SingleCache<T>(clazz) {
 
     final override fun get(): T? {
         synchronized(clazz) {
-            return _readonlyFlow.replayCache.lastOrNull() ?: syncFlow()
+            return _readonlyFlow.replayCache.lastOrNull() ?: syncFlowIfEmpty()
         }
     }
 
@@ -41,9 +41,11 @@ abstract class FlowSingleCache<T>(clazz: Class<T>) : SingleCache<T>(clazz) {
         }
     }
 
-    private fun syncFlow(): T? {
+    private fun syncFlowIfEmpty(): T? {
         return super.get()?.also {
-            _flow.tryEmit(it)
+            if (_flow.replayCache.isEmpty()) {
+                _flow.tryEmit(it)
+            }
         }
     }
 }
