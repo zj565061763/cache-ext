@@ -17,7 +17,7 @@ interface ISingleCache<T> {
     fun remove()
 
     /**
-     * 修改
+     * 修改，如果[block]返回值不为null，则将该返回值更新为缓存
      */
-    fun modify(block: (cache: T) -> T): T?
+    fun modify(block: (cache: T) -> T?): T?
 }

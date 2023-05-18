@@ -34,11 +34,15 @@ abstract class SingleCache<T>(val clazz: Class<T>) : ISingleCache<T> {
         }
     }
 
-    override fun modify(block: (cache: T) -> T): T? {
+    override fun modify(block: (cache: T) -> T?): T? {
         synchronized(clazz) {
             val cache = get() ?: return null
-            return block(cache).also {
-                put(it)
+            val modify = block(cache)
+            return if (modify != null) {
+                put(modify)
+                modify
+            } else {
+                cache
             }
         }
     }
