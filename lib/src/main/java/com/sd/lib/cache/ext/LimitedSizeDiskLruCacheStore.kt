@@ -7,7 +7,7 @@ import java.io.File
 /**
  * 限制大小的Lru算法磁盘缓存
  */
-internal class LimitedSizeDiskLruCacheStore(
+class LimitedSizeDiskLruCacheStore(
     directory: File,
     limitMB: Int = 100,
 ) : Cache.CacheStore {
