@@ -33,6 +33,7 @@ android {
 
 dependencies {
     api(libs.sd.cache)
+    api(libs.sd.diskLruCache)
     api(libs.kotlin.coroutines)
 }
 
