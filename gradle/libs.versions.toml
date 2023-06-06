@@ -7,9 +7,6 @@ androidTargetSdk = "33"
 androidGradlePlugin = "8.0.1"
 kotlin = "1.8.21"
 
-composeBom = "2023.05.01"
-composeCompiler = "1.4.7"
-
 [libraries]
 
 androidx-appcompat = "androidx.appcompat:appcompat:1.6.1"
