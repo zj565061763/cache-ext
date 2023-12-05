@@ -4,6 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 abstract class FlowSingleCache<T>(clazz: Class<T>) : SingleCache<T>(clazz) {
     private val _flow = MutableSharedFlow<T>(
@@ -11,8 +12,13 @@ abstract class FlowSingleCache<T>(clazz: Class<T>) : SingleCache<T>(clazz) {
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
+    private val _readonlyFlow by lazy {
+        get()
+        _flow.asSharedFlow()
+    }
+
     fun flow(): Flow<T> {
-        return _flow
+        return _readonlyFlow
     }
 
     final override fun get(): T? {
