@@ -20,8 +20,8 @@ class LimitedSizeDiskLruCacheStore(
     }
 
     override fun putCache(key: String, value: ByteArray): Boolean {
-        return _cache.edit(key) { editFile ->
-            editFile.outputStream().buffered().use {
+        return _cache.edit(key) { file ->
+            file.outputStream().buffered().use {
                 it.write(value)
                 true
             }
