@@ -1,5 +1,7 @@
 package com.sd.lib.cache.ext.multi
 
+import kotlinx.coroutines.Dispatchers
+
 interface IMultiCache<T> {
     /**
      * 保存
@@ -18,6 +20,7 @@ interface IMultiCache<T> {
 
     /**
      * 编辑
+     * @param block [Dispatchers.IO]上执行
      */
-    suspend fun <R> edit(block: suspend IMultiCache<T>.() -> R): R
+    suspend fun <R> edit(block: IMultiCache<T>.() -> R): R
 }
