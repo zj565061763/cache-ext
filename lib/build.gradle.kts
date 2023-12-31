@@ -32,18 +32,18 @@ kotlin {
 
 dependencies {
     api(libs.sd.cache)
-    api(libs.sd.diskLruCache)
     api(libs.kotlin.coroutines)
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("release") {
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            groupId = libGroupId
+            artifactId = libArtifactId
+            version = libVersionName
+
+            afterEvaluate {
                 from(components["release"])
-                groupId = libGroupId
-                artifactId = libArtifactId
-                version = libVersionName
             }
         }
     }

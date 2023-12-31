@@ -1,58 +1,34 @@
 package com.sd.lib.cache.ext.single
 
-import com.sd.lib.cache.Cache
-import com.sd.lib.cache.FCache
+import kotlinx.coroutines.flow.Flow
 
-abstract class SingleCache<T>(val clazz: Class<T>) : ISingleCache<T> {
-    protected open val cache: Cache get() = FCache.disk()
-
-    override fun put(model: T?): Boolean {
-        if (model == null) return false
-        synchronized(clazz) {
-            return cache.cacheObject().put(model).also { result ->
-                if (result) {
-                    onCacheChanged(model)
-                }
-            }
-        }
-    }
-
-    override fun get(): T? {
-        synchronized(clazz) {
-            val result = cache.cacheObject().get(clazz)
-            if (result != null) return result
-            return create()?.also {
-                put(it)
-            }
-        }
-    }
-
-    override fun remove() {
-        synchronized(clazz) {
-            cache.cacheObject().remove(clazz)
-            onCacheChanged(null)
-        }
-    }
-
-    override fun modify(block: (cache: T) -> T): T? {
-        synchronized(clazz) {
-            val cache = get() ?: return null
-            return block(cache).also {
-                put(it)
-            }
-        }
-    }
+interface ISingleCache<T> {
+    /**
+     * 保存
+     */
+    fun put(model: T?): Boolean
 
     /**
-     * 缓存对象变化回调
+     * 如果缓存不存在则保存，如果缓存已存在则不保存
      */
-    protected open fun onCacheChanged(cache: T?) {
-    }
+    fun putIfAbsent(model: T?): Boolean
 
     /**
-     * 如果[get]方法未找到缓存，则会尝试调用此方法创建缓存返回
+     * 获取
      */
-    protected open fun create(): T? {
-        return null
-    }
+    fun get(): T?
+
+    /**
+     * 删除
+     */
+    fun remove()
+
+    /**
+     * [block]返回值更新为缓存
+     */
+    fun modify(block: (cache: T?) -> T?): T?
+}
+
+interface ISingleFlowCache<T> : ISingleCache<T> {
+    fun flow(): Flow<T?>
 }
