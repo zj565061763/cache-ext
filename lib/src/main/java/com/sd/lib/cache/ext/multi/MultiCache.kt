@@ -4,15 +4,20 @@ interface IMultiCache<T> {
     /**
      * 保存
      */
-    fun put(key: String, model: T?): Boolean
+    suspend fun put(key: String, model: T?): Boolean
 
     /**
      * 获取
      */
-    fun get(key: String): T?
+    suspend fun get(key: String): T?
 
     /**
      * 删除
      */
-    fun remove(key: String)
+    suspend fun remove(key: String)
+
+    /**
+     * 编辑
+     */
+    suspend fun <R> edit(block: suspend IMultiCache<T>.() -> R): R
 }
