@@ -6,27 +6,27 @@ interface ISingleCache<T> {
     /**
      * 保存
      */
-    fun put(model: T?): Boolean
+    suspend fun put(model: T?): Boolean
 
     /**
      * 如果缓存不存在则保存，如果缓存已存在则不保存
      */
-    fun putIfAbsent(model: T?): Boolean
+    suspend fun putIfAbsent(model: T?): Boolean
 
     /**
      * 获取
      */
-    fun get(): T?
+    suspend fun get(): T?
 
     /**
      * 删除
      */
-    fun remove()
+    suspend fun remove()
 
     /**
-     * [block]返回值更新为缓存
+     * 编辑
      */
-    fun modify(block: (cache: T?) -> T?): T?
+    suspend fun <R> edit(block: ISingleCache<T>.() -> R): R
 }
 
 interface ISingleFlowCache<T> : ISingleCache<T> {
