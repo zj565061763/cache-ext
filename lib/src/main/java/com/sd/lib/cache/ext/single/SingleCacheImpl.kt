@@ -22,7 +22,6 @@ abstract class SingleCache<T>(
     private val _mutex = Mutex()
 
     override suspend fun put(model: T?): Boolean {
-        if (model == null) return false
         _mutex.withLock {
             return withContext(Dispatchers.IO) {
                 _cache.put(model)
@@ -35,7 +34,6 @@ abstract class SingleCache<T>(
     }
 
     override suspend fun putIfAbsent(model: T?): Boolean {
-        if (model == null) return false
         _mutex.withLock {
             return if (get() == null) put(model) else false
         }
