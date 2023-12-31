@@ -62,7 +62,7 @@ abstract class SingleCache<T>(
         }
     }
 
-    override suspend fun <R> edit(block: ISingleCache<T>.() -> R): R {
+    final override suspend fun <R> edit(block: suspend ISingleCache<T>.() -> R): R {
         _mutex.withLock {
             return block()
         }
@@ -92,8 +92,10 @@ abstract class SingleFlowCache<T>(
     }
 
     override suspend fun get(): T? {
-        return _flow.value ?: super.get().also {
-            _flow.value = it
+        return edit {
+            _flow.value ?: super.get().also {
+                _flow.value = it
+            }
         }
     }
 
@@ -103,7 +105,7 @@ abstract class SingleFlowCache<T>(
 
     init {
         MainScope().launch {
-            get()
+            _flow.value = super.get()
         }
     }
 }

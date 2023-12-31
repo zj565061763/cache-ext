@@ -26,7 +26,7 @@ interface ISingleCache<T> {
     /**
      * 编辑
      */
-    suspend fun <R> edit(block: ISingleCache<T>.() -> R): R
+    suspend fun <R> edit(block: suspend ISingleCache<T>.() -> R): R
 }
 
 interface ISingleFlowCache<T> : ISingleCache<T> {
