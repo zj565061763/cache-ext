@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 
 abstract class SingleCache<T>(
     clazz: Class<T>,
@@ -18,7 +17,6 @@ abstract class SingleCache<T>(
 ) : ISingleCache<T> {
 
     private val _cache = cache.cObject(clazz)
-    private val _mutex = Mutex()
 
     override suspend fun put(model: T?): Boolean {
         return edit {
@@ -61,7 +59,7 @@ abstract class SingleCache<T>(
     protected open fun onCacheChanged(cache: T?) {}
 
     /**
-     * 如果[get]方法未找到缓存，则会尝试调用此方法创建缓存返回，[Dispatchers.IO]上执行
+     * 如果[get]方法未找到缓存，会尝试调用此方法创建缓存返回，[Dispatchers.IO]上执行
      */
     protected open fun create(): T? = null
 }
@@ -79,9 +77,7 @@ abstract class SingleFlowCache<T>(
     }
 
     override suspend fun get(): T? {
-        return edit {
-            _flow.value ?: super.get().also { _flow.value = it }
-        }
+        return _flow.value ?: super.get().also { _flow.value = it }
     }
 
     final override fun onCacheChanged(cache: T?) {
