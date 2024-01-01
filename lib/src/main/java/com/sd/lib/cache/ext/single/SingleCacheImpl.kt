@@ -1,8 +1,8 @@
 package com.sd.lib.cache.ext.single
 
 import com.sd.lib.cache.Cache
+import com.sd.lib.cache.FCache
 import com.sd.lib.cache.ext.cacheEdit
-import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 abstract class SingleCache<T>(
     clazz: Class<T>,
-    cache: Cache = fCache,
+    cache: Cache = FCache.get(),
 ) : ISingleCache<T> {
 
     private val _cache = cache.cObject(clazz)
@@ -66,7 +66,7 @@ abstract class SingleCache<T>(
 
 abstract class SingleFlowCache<T>(
     clazz: Class<T>,
-    cache: Cache = fCache,
+    cache: Cache = FCache.get(),
 ) : SingleCache<T>(clazz, cache), ISingleFlowCache<T> {
 
     private val _flow: MutableStateFlow<T?> = MutableStateFlow(null)

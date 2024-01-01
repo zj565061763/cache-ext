@@ -1,12 +1,12 @@
 package com.sd.lib.cache.ext.multi
 
 import com.sd.lib.cache.Cache
+import com.sd.lib.cache.FCache
 import com.sd.lib.cache.ext.cacheEdit
-import com.sd.lib.cache.fCache
 
 class MultiCache<T>(
     clazz: Class<T>,
-    cache: Cache = fCache,
+    cache: Cache = FCache.get(),
 ) : IMultiCache<T> {
 
     private val _cache = cache.cObjects(clazz)
