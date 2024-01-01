@@ -1,7 +1,11 @@
 package com.sd.lib.cache.ext.single
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * 单缓存管理接口，所有方法均在[Dispatchers.IO]上执行
+ */
 interface ISingleCache<T> {
     /**
      * 保存
@@ -24,7 +28,7 @@ interface ISingleCache<T> {
     suspend fun remove()
 
     /**
-     * 编辑
+     * 编辑，[block]为原子性操作
      */
     suspend fun <R> edit(block: suspend ISingleCache<T>.() -> R): R
 }
