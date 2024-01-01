@@ -9,7 +9,7 @@ interface IMultiCache<T> {
     /**
      * 保存
      */
-    suspend fun put(key: String, model: T?): Boolean
+    suspend fun put(key: String, value: T?): Boolean
 
     /**
      * 获取
