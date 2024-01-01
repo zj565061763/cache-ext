@@ -1,6 +1,7 @@
 package com.sd.lib.cache.ext.single
 
 import com.sd.lib.cache.Cache
+import com.sd.lib.cache.ext.cacheEdit
 import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -10,8 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 
 abstract class SingleCache<T>(
     clazz: Class<T>,
@@ -22,10 +21,8 @@ abstract class SingleCache<T>(
     private val _mutex = Mutex()
 
     override suspend fun put(model: T?): Boolean {
-        _mutex.withLock {
-            return withContext(Dispatchers.IO) {
-                _cache.put(model)
-            }.also {
+        return edit {
+            _cache.put(model).also {
                 if (it) {
                     onCacheChanged(model)
                 }
@@ -34,45 +31,37 @@ abstract class SingleCache<T>(
     }
 
     override suspend fun putIfAbsent(model: T?): Boolean {
-        _mutex.withLock {
-            return if (get() == null) put(model) else false
+        return edit {
+            if (get() == null) put(model) else false
         }
     }
 
     override suspend fun get(): T? {
-        _mutex.withLock {
-            withContext(Dispatchers.IO) {
-                _cache.get()
-            }?.let { return it }
-
-            return create()?.also {
-                put(it)
-            }
+        return edit {
+            _cache.get() ?: create()?.also { put(it) }
         }
     }
 
     override suspend fun remove() {
-        _mutex.withLock {
-            withContext(Dispatchers.IO) {
-                _cache.remove()
-            }
+        edit {
+            _cache.remove()
             onCacheChanged(null)
         }
     }
 
     final override suspend fun <R> edit(block: suspend ISingleCache<T>.() -> R): R {
-        _mutex.withLock {
-            return block()
+        return cacheEdit {
+            block()
         }
     }
 
     /**
-     * 缓存对象变化回调
+     * 缓存对象变化回调，[Dispatchers.IO]上执行
      */
     protected open fun onCacheChanged(cache: T?) {}
 
     /**
-     * 如果[get]方法未找到缓存，则会尝试调用此方法创建缓存返回
+     * 如果[get]方法未找到缓存，则会尝试调用此方法创建缓存返回，[Dispatchers.IO]上执行
      */
     protected open fun create(): T? = null
 }
@@ -91,9 +80,7 @@ abstract class SingleFlowCache<T>(
 
     override suspend fun get(): T? {
         return edit {
-            _flow.value ?: super.get().also {
-                _flow.value = it
-            }
+            _flow.value ?: super.get().also { _flow.value = it }
         }
     }
 
