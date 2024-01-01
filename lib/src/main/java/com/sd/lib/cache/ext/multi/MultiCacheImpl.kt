@@ -1,9 +1,8 @@
 package com.sd.lib.cache.ext.multi
 
 import com.sd.lib.cache.Cache
+import com.sd.lib.cache.ext.cacheEdit
 import com.sd.lib.cache.fCache
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class MultiCache<T>(
     clazz: Class<T>,
@@ -13,22 +12,26 @@ class MultiCache<T>(
     private val _cache = cache.cObjects(clazz)
 
     override suspend fun put(key: String, model: T?): Boolean {
-        return edit { _cache.put(key, model) }
+        return cacheEdit {
+            _cache.put(key, model)
+        }
     }
 
     override suspend fun get(key: String): T? {
-        return edit { _cache.get(key) }
+        return cacheEdit {
+            _cache.get(key)
+        }
     }
 
     override suspend fun remove(key: String) {
-        edit { _cache.remove(key) }
+        cacheEdit {
+            _cache.remove(key)
+        }
     }
 
-    override suspend fun <R> edit(block: IMultiCache<T>.() -> R): R {
-        return withContext(Dispatchers.IO) {
-            synchronized(this@MultiCache) {
-                block()
-            }
+    override suspend fun <R> edit(block: suspend IMultiCache<T>.() -> R): R {
+        return cacheEdit {
+            block()
         }
     }
 }
