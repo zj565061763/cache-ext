@@ -18,19 +18,19 @@ abstract class SingleCache<T>(
 
     private val _cache = cache.cObject(clazz)
 
-    override suspend fun put(model: T?): Boolean {
+    override suspend fun put(value: T?): Boolean {
         return edit {
-            _cache.put(model).also {
+            _cache.put(value).also {
                 if (it) {
-                    onCacheChanged(model)
+                    onCacheChanged(value)
                 }
             }
         }
     }
 
-    override suspend fun putIfAbsent(model: T?): Boolean {
+    override suspend fun putIfAbsent(value: T?): Boolean {
         return edit {
-            if (get() == null) put(model) else false
+            if (get() == null) put(value) else false
         }
     }
 
@@ -56,7 +56,7 @@ abstract class SingleCache<T>(
     /**
      * 缓存对象变化回调，[Dispatchers.IO]上执行
      */
-    protected open fun onCacheChanged(cache: T?) {}
+    protected open fun onCacheChanged(value: T?) {}
 
     /**
      * 如果[get]方法未找到缓存，会尝试调用此方法创建缓存返回，[Dispatchers.IO]上执行
@@ -80,8 +80,8 @@ abstract class SingleFlowCache<T>(
         return _flow.value ?: super.get().also { _flow.value = it }
     }
 
-    final override fun onCacheChanged(cache: T?) {
-        _flow.value = cache
+    final override fun onCacheChanged(value: T?) {
+        _flow.value = value
     }
 
     init {

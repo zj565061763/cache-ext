@@ -10,12 +10,12 @@ interface ISingleCache<T> {
     /**
      * 保存
      */
-    suspend fun put(model: T?): Boolean
+    suspend fun put(value: T?): Boolean
 
     /**
      * 如果缓存不存在则保存，如果缓存已存在则不保存
      */
-    suspend fun putIfAbsent(model: T?): Boolean
+    suspend fun putIfAbsent(value: T?): Boolean
 
     /**
      * 获取
