@@ -29,6 +29,12 @@ class MultiCache<T>(
         }
     }
 
+    override suspend fun keys(): Array<String> {
+        return edit {
+            _cache.keys()
+        }
+    }
+
     override suspend fun <R> edit(block: suspend IMultiCache<T>.() -> R): R {
         return cacheEdit {
             block()
