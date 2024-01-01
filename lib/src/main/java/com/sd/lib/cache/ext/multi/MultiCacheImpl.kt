@@ -12,19 +12,19 @@ class MultiCache<T>(
     private val _cache = cache.cObjects(clazz)
 
     override suspend fun put(key: String, model: T?): Boolean {
-        return cacheEdit {
+        return edit {
             _cache.put(key, model)
         }
     }
 
     override suspend fun get(key: String): T? {
-        return cacheEdit {
+        return edit {
             _cache.get(key)
         }
     }
 
     override suspend fun remove(key: String) {
-        cacheEdit {
+        edit {
             _cache.remove(key)
         }
     }
