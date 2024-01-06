@@ -5,9 +5,10 @@ import com.sd.lib.cache.FCache
 import com.sd.lib.cache.ext.FMutableFlowStore
 import com.sd.lib.cache.ext.cacheEdit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 open class MultiCache<T>(
     clazz: Class<T>,
@@ -52,13 +53,12 @@ open class MultiCache<T>(
         }
     }
 
-    final override suspend fun flowOf(key: String): Flow<T?> {
-        return edit {
-            _flowStore.getOrPut(key) {
-                val initValue = runBlocking {
-                    get(key)
+    final override fun flowOf(key: String): Flow<T?> {
+        return _flowStore.getOrPut(key) {
+            MutableStateFlow<T?>(null).also { flow ->
+                MainScope().launch {
+                    flow.value = get(key)
                 }
-                MutableStateFlow(initValue)
             }
         }
     }

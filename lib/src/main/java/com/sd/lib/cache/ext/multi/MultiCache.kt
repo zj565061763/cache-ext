@@ -35,5 +35,5 @@ interface IMultiCache<T> {
     /**
      * [key]对应到
      */
-    suspend fun flowOf(key: String): Flow<T?>
+    fun flowOf(key: String): Flow<T?>
 }
