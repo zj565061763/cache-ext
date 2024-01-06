@@ -18,17 +18,28 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
-        getFlowCaches()
+        getCaches()
     }
 
     private fun getCache() {
         _scope.launch {
-            logMsg { "get start" }
+            logMsg { "getCache start" }
 
             val user = CacheUser.get()
-            logMsg { user.toString() }
+            logMsg { "getCache:$user" }
 
-            logMsg { "get end" }
+            logMsg { "getCache end" }
+        }
+    }
+
+    private fun getCaches() {
+        _scope.launch {
+            logMsg { "getCaches start" }
+
+            val user = CachesUser.get("id")
+            logMsg { "getCaches:$user" }
+
+            logMsg { "getCaches end" }
         }
     }
 
