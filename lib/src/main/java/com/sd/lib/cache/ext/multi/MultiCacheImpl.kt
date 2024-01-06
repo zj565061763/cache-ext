@@ -20,7 +20,9 @@ open class MultiCache<T>(
     final override suspend fun put(key: String, value: T?): Boolean {
         return edit {
             _cache.put(key, value).also {
-                _flowStore.get(key)?.value = value
+                if (it) {
+                    _flowStore.get(key)?.value = value
+                }
             }
         }
     }
@@ -34,6 +36,7 @@ open class MultiCache<T>(
     final override suspend fun remove(key: String) {
         edit {
             _cache.remove(key)
+            _flowStore.get(key)?.value = null
         }
     }
 
