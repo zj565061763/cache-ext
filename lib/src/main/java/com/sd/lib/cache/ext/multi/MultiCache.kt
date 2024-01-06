@@ -1,6 +1,7 @@
 package com.sd.lib.cache.ext.multi
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 
 /**
  * 多缓存管理接口，所有方法均在[Dispatchers.IO]上执行
@@ -30,4 +31,9 @@ interface IMultiCache<T> {
      * 编辑，[block]为原子性操作
      */
     suspend fun <R> edit(block: suspend IMultiCache<T>.() -> R): R
+
+    /**
+     * [key]对应到
+     */
+    suspend fun flowOf(key: String): Flow<T?>
 }
