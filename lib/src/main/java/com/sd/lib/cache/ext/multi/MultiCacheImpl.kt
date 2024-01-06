@@ -55,7 +55,9 @@ open class MultiCache<T>(
     final override suspend fun flowOf(key: String): Flow<T?> {
         return edit {
             _flowStore.getOrPut(key) {
-                val initValue = runBlocking { get(key) }
+                val initValue = runBlocking {
+                    get(key)
+                }
                 MutableStateFlow(initValue)
             }
         }
