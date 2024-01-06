@@ -19,7 +19,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(_binding.root)
         _scope.launch {
             logMsg { "get start" }
-            CacheUser.get()
+
+            val user = CacheUser.get()
+            logMsg { user.toString() }
+
             logMsg { "get end" }
         }
     }
