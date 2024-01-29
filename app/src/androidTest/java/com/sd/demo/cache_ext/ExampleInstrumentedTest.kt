@@ -36,7 +36,6 @@ class ExampleInstrumentedTest {
         CacheUser.flow().test {
             val item = checkNotNull(awaitItem())
             assertEquals(item, user)
-            cancelAndIgnoreRemainingEvents()
         }
     }
 }
