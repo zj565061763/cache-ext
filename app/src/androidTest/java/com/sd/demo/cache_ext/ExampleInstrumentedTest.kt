@@ -40,23 +40,15 @@ class ExampleInstrumentedTest {
 
     @Test
     fun multiCacheFlowTest() = runBlocking {
-        checkNotNull(CachesUser.get("default")).let {
-            assertEquals("default", it.id)
-            assertEquals("default", it.name)
-        }
+        val defaultUser = UserModel("default", "default")
+        assertEquals(defaultUser, CachesUser.get("default"))
 
-        val user = UserModel("1", "1")
-        assertEquals(true, CachesUser.put("1", user))
-
-        checkNotNull(CachesUser.get("1")).let { cache ->
-            assertEquals("1", cache.id)
-            assertEquals("1", cache.name)
-            assertEquals(user, cache)
-        }
-
-        CachesUser.flowOf("1").test {
-            val item = checkNotNull(awaitItem())
-            assertEquals(user, item)
+        UserModel("1", "1").let { user ->
+            assertEquals(true, CachesUser.put("1", user))
+            assertEquals(user, CachesUser.get("1"))
+            CachesUser.flowOf("1").test {
+                assertEquals(user, awaitItem())
+            }
         }
     }
 }
