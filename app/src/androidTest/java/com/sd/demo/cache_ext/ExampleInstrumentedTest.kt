@@ -3,6 +3,7 @@ package com.sd.demo.cache_ext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.sd.demo.cache_ext.cache.CacheUser
+import com.sd.demo.cache_ext.cache.CachesUser
 import com.sd.demo.cache_ext.cache.UserModel
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
@@ -34,6 +35,29 @@ class ExampleInstrumentedTest {
         }
 
         CacheUser.flow().test {
+            val item = checkNotNull(awaitItem())
+            assertEquals(item, user)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun multiCacheFlowTest() = runBlocking {
+        checkNotNull(CachesUser.get("default")).let {
+            assertEquals("default", it.id)
+            assertEquals("default", it.name)
+        }
+
+        val user = UserModel("1", "1")
+        assertEquals(true, CachesUser.put("1", user))
+
+        checkNotNull(CachesUser.get("1")).let { cache ->
+            assertEquals("1", cache.id)
+            assertEquals("1", cache.name)
+            assertEquals(cache, user)
+        }
+
+        CachesUser.flowOf("1").test {
             val item = checkNotNull(awaitItem())
             assertEquals(item, user)
             cancelAndIgnoreRemainingEvents()
