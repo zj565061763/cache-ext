@@ -50,5 +50,11 @@ class ExampleInstrumentedTest {
                 assertEquals(user, awaitItem())
             }
         }
+
+        CachesUser.remove("1")
+        assertEquals(null, CachesUser.get("1"))
+        CachesUser.flowOf("1").test {
+            assertEquals(null, awaitItem())
+        }
     }
 }
