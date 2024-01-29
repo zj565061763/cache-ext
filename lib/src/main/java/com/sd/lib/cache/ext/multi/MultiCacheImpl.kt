@@ -6,8 +6,9 @@ import com.sd.lib.cache.ext.FMutableFlowStore
 import com.sd.lib.cache.ext.cacheEdit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 open class MultiCache<T>(
@@ -16,13 +17,13 @@ open class MultiCache<T>(
 ) : IMultiCache<T> {
 
     private val _cache = cache.cObjects(clazz)
-    private val _flowStore = FMutableFlowStore<MutableStateFlow<T?>>()
+    private val _flowStore = FMutableFlowStore<MutableSharedFlow<T?>>()
 
     final override suspend fun put(key: String, value: T?): Boolean {
         return edit {
             _cache.put(key, value).also {
                 if (it) {
-                    _flowStore.get(key)?.value = value
+                    _flowStore.get(key)?.tryEmit(value)
                 }
             }
         }
@@ -37,7 +38,7 @@ open class MultiCache<T>(
     final override suspend fun remove(key: String) {
         edit {
             _cache.remove(key)
-            _flowStore.get(key)?.value = null
+            _flowStore.get(key)?.tryEmit(null)
         }
     }
 
@@ -49,9 +50,12 @@ open class MultiCache<T>(
 
     final override fun flowOf(key: String): Flow<T?> {
         return _flowStore.getOrPut(key) {
-            MutableStateFlow<T?>(null).also { flow ->
+            MutableSharedFlow<T?>(
+                replay = 1,
+                onBufferOverflow = BufferOverflow.DROP_OLDEST,
+            ).also { flow ->
                 MainScope().launch {
-                    flow.value = get(key)
+                    flow.tryEmit(get(key))
                 }
             }
         }

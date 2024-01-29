@@ -14,7 +14,6 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-
 inline fun logMsg(block: () -> String) {
     Log.i("cache-ext-demo", block())
 }
