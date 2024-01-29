@@ -23,11 +23,6 @@ interface IMultiCache<T> {
     suspend fun remove(key: String)
 
     /**
-     * 所有key
-     */
-    suspend fun keys(): Array<String>
-
-    /**
      * 编辑，[block]为原子性操作
      */
     suspend fun <R> edit(block: suspend IMultiCache<T>.() -> R): R
