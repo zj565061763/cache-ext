@@ -20,24 +20,21 @@ class ExampleInstrumentedTest {
 
     @Test
     fun singleCacheFlowTest() = runBlocking {
-        checkNotNull(CacheUser.get()).let {
-            assertEquals("default", it.id)
-            assertEquals("default", it.name)
-        }
+        val defaultUser = UserModel("default", "default")
+        assertEquals(defaultUser, CacheUser.get())
 
         val user = UserModel("1", "1")
         assertEquals(true, CacheUser.put(user))
-
-        checkNotNull(CacheUser.get()).let { cache ->
-            assertEquals("1", cache.id)
-            assertEquals("1", cache.name)
-            assertEquals(cache, user)
-        }
+        assertEquals(user, CacheUser.get())
 
         CacheUser.flow().test {
-            val item = checkNotNull(awaitItem())
-            assertEquals(item, user)
-            cancelAndIgnoreRemainingEvents()
+            assertEquals(user, awaitItem())
+        }
+
+        CacheUser.remove()
+        assertEquals(defaultUser, CacheUser.get())
+        CacheUser.flow().test {
+            assertEquals(defaultUser, awaitItem())
         }
     }
 
@@ -54,13 +51,12 @@ class ExampleInstrumentedTest {
         checkNotNull(CachesUser.get("1")).let { cache ->
             assertEquals("1", cache.id)
             assertEquals("1", cache.name)
-            assertEquals(cache, user)
+            assertEquals(user, cache)
         }
 
         CachesUser.flowOf("1").test {
             val item = checkNotNull(awaitItem())
-            assertEquals(item, user)
-            cancelAndIgnoreRemainingEvents()
+            assertEquals(user, item)
         }
     }
 }
