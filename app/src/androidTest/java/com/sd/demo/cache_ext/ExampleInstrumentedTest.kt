@@ -1,12 +1,13 @@
 package com.sd.demo.cache_ext
 
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
-
+import app.cash.turbine.test
+import com.sd.demo.cache_ext.cache.CacheUser
+import com.sd.demo.cache_ext.cache.UserModel
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import org.junit.Assert.*
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -15,9 +16,27 @@ import org.junit.Assert.*
  */
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
+
     @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+    fun singleCacheFlowTest() = runBlocking {
+        checkNotNull(CacheUser.get()).let {
+            assertEquals("default", it.id)
+            assertEquals("default", it.name)
+        }
+
+        val user = UserModel("1", "1")
+        assertEquals(true, CacheUser.put(user))
+
+        checkNotNull(CacheUser.get()).let { cache ->
+            assertEquals("1", cache.id)
+            assertEquals("1", cache.name)
+            assertEquals(cache, user)
+        }
+
+        CacheUser.flow().test {
+            val item = checkNotNull(awaitItem())
+            assertEquals(item, user)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }
