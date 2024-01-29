@@ -23,12 +23,12 @@ class ExampleInstrumentedTest {
         val defaultUser = UserModel("default", "default")
         assertEquals(defaultUser, CacheUser.get())
 
-        val user = UserModel("1", "1")
-        assertEquals(true, CacheUser.put(user))
-        assertEquals(user, CacheUser.get())
-
-        CacheUser.flow().test {
-            assertEquals(user, awaitItem())
+        UserModel("1", "1").let { user ->
+            assertEquals(true, CacheUser.put(user))
+            assertEquals(user, CacheUser.get())
+            CacheUser.flow().test {
+                assertEquals(user, awaitItem())
+            }
         }
 
         CacheUser.remove()
