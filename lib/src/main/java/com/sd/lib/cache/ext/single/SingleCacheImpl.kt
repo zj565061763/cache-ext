@@ -29,12 +29,6 @@ abstract class SingleCache<T>(
         }
     }
 
-    override suspend fun putIfAbsent(value: T?): Boolean {
-        return edit {
-            if (get() == null) put(value) else false
-        }
-    }
-
     override suspend fun get(): T? {
         return edit {
             _cache.get() ?: create()?.also { put(it) }
