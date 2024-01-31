@@ -31,8 +31,8 @@ abstract class SingleCache<T>(
 
     override suspend fun get(): T? {
         return edit {
-            _cache.get() ?: create()?.let {
-                if (put(it)) it else null
+            _cache.get() ?: create()?.let { create ->
+                if (put(create)) create else null
             }
         }
     }
