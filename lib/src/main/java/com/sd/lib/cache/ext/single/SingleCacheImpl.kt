@@ -53,7 +53,7 @@ abstract class SingleCache<T>(
     /**
      * 缓存对象变化回调，[Dispatchers.IO]上执行
      */
-    protected open fun onCacheChanged(value: T?) {}
+    protected open fun onCacheChanged(value: T?) = Unit
 
     /**
      * 如果[get]方法未找到缓存，会尝试调用此方法创建缓存返回，[Dispatchers.IO]上执行
