@@ -44,7 +44,7 @@ abstract class SingleCache<T>(
         }
     }
 
-    final override suspend fun <R> edit(block: suspend ISingleCache<T>.() -> R): R {
+    override suspend fun <R> edit(block: suspend ISingleCache<T>.() -> R): R {
         return cacheEdit {
             block()
         }
@@ -80,7 +80,7 @@ abstract class SingleFlowCache<T>(
         return _readonlyFlow
     }
 
-    final override fun onCacheChanged(value: T?) {
+    override fun onCacheChanged(value: T?) {
         _flow.tryEmit(value)
     }
 
