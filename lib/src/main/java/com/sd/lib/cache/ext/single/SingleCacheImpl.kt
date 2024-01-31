@@ -21,8 +21,8 @@ abstract class SingleCache<T>(
 
     override suspend fun put(value: T?): Boolean {
         return edit {
-            _cache.put(value).also {
-                if (it) {
+            _cache.put(value).also { put ->
+                if (put) {
                     onCacheChanged(value)
                 }
             }
