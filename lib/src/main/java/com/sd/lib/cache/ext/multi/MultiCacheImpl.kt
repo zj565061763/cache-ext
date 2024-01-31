@@ -31,7 +31,9 @@ open class MultiCache<T>(
 
     override suspend fun get(key: String): T? {
         return edit {
-            _cache.get(key) ?: create(key)?.also { put(key, it) }
+            _cache.get(key) ?: create(key)?.let { create ->
+                if (put(key, create)) create else null
+            }
         }
     }
 
