@@ -21,8 +21,8 @@ open class MultiCache<T>(
 
     final override suspend fun put(key: String, value: T?): Boolean {
         return edit {
-            _cache.put(key, value).also {
-                if (it) {
+            _cache.put(key, value).also { put ->
+                if (put) {
                     _flowStore.get(key)?.tryEmit(value)
                 }
             }
