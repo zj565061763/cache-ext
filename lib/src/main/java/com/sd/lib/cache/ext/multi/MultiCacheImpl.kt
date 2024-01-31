@@ -19,7 +19,7 @@ open class MultiCache<T>(
     private val _cache = cache.cObjects(clazz)
     private val _flowStore = FMutableFlowStore<MutableSharedFlow<T?>>()
 
-    final override suspend fun put(key: String, value: T?): Boolean {
+    override suspend fun put(key: String, value: T?): Boolean {
         return edit {
             _cache.put(key, value).also { put ->
                 if (put) {
@@ -29,20 +29,20 @@ open class MultiCache<T>(
         }
     }
 
-    final override suspend fun get(key: String): T? {
+    override suspend fun get(key: String): T? {
         return edit {
             _cache.get(key) ?: create(key)?.also { put(key, it) }
         }
     }
 
-    final override suspend fun remove(key: String) {
+    override suspend fun remove(key: String) {
         edit {
             _cache.remove(key)
             _flowStore.get(key)?.tryEmit(null)
         }
     }
 
-    final override suspend fun <R> edit(block: suspend IMultiCache<T>.() -> R): R {
+    override suspend fun <R> edit(block: suspend IMultiCache<T>.() -> R): R {
         return cacheEdit {
             block()
         }
