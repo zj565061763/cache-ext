@@ -45,7 +45,7 @@ open class MultiCache<T>(
         }
     }
 
-    override suspend fun <R> edit(block: suspend IMultiCache<T>.() -> R): R {
+    override suspend fun <R> edit(block: suspend () -> R): R {
         return withContext(CacheDispatcher) { block() }
     }
 
