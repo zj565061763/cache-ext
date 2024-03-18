@@ -28,7 +28,7 @@ interface IMultiCache<T> {
     suspend fun <R> edit(block: suspend () -> R): R
 
     /**
-     * [key]对应到
+     * [key]对应的[Flow]
      */
-    fun flowOf(key: String): Flow<T?>
+    suspend fun flow(key: String): Flow<T?>
 }

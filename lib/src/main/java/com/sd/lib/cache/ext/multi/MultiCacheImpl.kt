@@ -49,7 +49,7 @@ open class MultiCache<T>(
         return withContext(CacheDispatcher) { block() }
     }
 
-    final override fun flowOf(key: String): Flow<T?> {
+    final override suspend fun flow(key: String): Flow<T?> {
         return _flowStore.getOrPut(key) {
             MutableSharedFlow<T?>(
                 replay = 1,

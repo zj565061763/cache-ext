@@ -46,14 +46,14 @@ class ExampleInstrumentedTest {
         UserModel("1", "1").let { user ->
             assertEquals(true, CachesUser.put("1", user))
             assertEquals(user, CachesUser.get("1"))
-            CachesUser.flowOf("1").test {
+            CachesUser.flow("1").test {
                 assertEquals(user, awaitItem())
             }
         }
 
         CachesUser.remove("1")
         assertEquals(null, CachesUser.get("1"))
-        CachesUser.flowOf("1").test {
+        CachesUser.flow("1").test {
             assertEquals(null, awaitItem())
         }
     }
