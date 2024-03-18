@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-abstract class SingleCache<T>(
+open class SingleCache<T>(
     clazz: Class<T>,
     cache: Cache = fCache,
 ) : ISingleCache<T> {
@@ -59,7 +59,7 @@ abstract class SingleCache<T>(
     protected open fun create(): T? = null
 }
 
-abstract class SingleFlowCache<T>(
+open class SingleFlowCache<T>(
     clazz: Class<T>,
     cache: Cache = fCache,
 ) : SingleCache<T>(clazz, cache), ISingleFlowCache<T> {
