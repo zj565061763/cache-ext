@@ -6,10 +6,10 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btn"
+        android:id="@+id/btn_SampleSingleCache"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="button"
+        android:text="SampleSingleCache"
         android:textAllCaps="false" />
 
 </LinearLayout>
