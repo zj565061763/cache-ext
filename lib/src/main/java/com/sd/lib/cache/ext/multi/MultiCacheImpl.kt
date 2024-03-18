@@ -18,13 +18,12 @@ open class MultiCache<T>(
 ) : IMultiCache<T> {
 
     private val _cache = cache.multi(clazz)
-    private val _flowStore = FMutableFlowStore<MutableSharedFlow<T?>>()
 
     override suspend fun put(key: String, value: T?): Boolean {
         return edit {
             _cache.put(key, value).also { put ->
                 if (put) {
-                    _flowStore.get(key)?.tryEmit(value)
+                    onCacheChanged(key, value)
                 }
             }
         }
@@ -32,22 +31,43 @@ open class MultiCache<T>(
 
     override suspend fun get(key: String): T? {
         return edit {
-            _cache.get(key) ?: create(key)?.let { create ->
-                if (put(key, create)) create else null
-            }
+            _cache.get(key) ?: create(key)?.takeIf { put(key, it) }
         }
     }
 
     override suspend fun remove(key: String) {
         edit {
             _cache.remove(key)
-            _flowStore.get(key)?.tryEmit(null)
+            val create = create(key)
+            if (create == null) {
+                onCacheChanged(key, null)
+            } else {
+                put(key, create)
+            }
         }
     }
 
     override suspend fun <R> edit(block: suspend () -> R): R {
         return withContext(CacheDispatcher) { block() }
     }
+
+    /**
+     * 缓存对象变化回调，[Dispatchers.IO]上执行
+     */
+    protected open fun onCacheChanged(key: String, value: T?) = Unit
+
+    /**
+     * 如果[get]方法未找到缓存，会尝试调用此方法创建缓存返回，[Dispatchers.IO]上执行
+     */
+    protected open fun create(key: String): T? = null
+}
+
+open class MultiFlowCache<T>(
+    clazz: Class<T>,
+    cache: Cache = fCache,
+) : MultiCache<T>(clazz, cache), IMultiFlowCache<T> {
+
+    private val _flowStore = FMutableFlowStore<MutableSharedFlow<T?>>()
 
     final override suspend fun flow(key: String): Flow<T?> {
         return _flowStore.getOrPut(key) {
@@ -62,8 +82,7 @@ open class MultiCache<T>(
         }
     }
 
-    /**
-     * 如果[get]方法未找到缓存，会尝试调用此方法创建缓存返回，[Dispatchers.IO]上执行
-     */
-    protected open fun create(key: String): T? = null
+    override fun onCacheChanged(key: String, value: T?) {
+        _flowStore.get(key)?.tryEmit(value)
+    }
 }

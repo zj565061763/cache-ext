@@ -26,7 +26,9 @@ interface IMultiCache<T> {
      * 编辑，[block]为原子性操作
      */
     suspend fun <R> edit(block: suspend () -> R): R
+}
 
+interface IMultiFlowCache<T> : IMultiCache<T> {
     /**
      * [key]对应的[Flow]
      */
