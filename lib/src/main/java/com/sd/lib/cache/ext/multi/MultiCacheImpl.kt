@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
+import java.lang.ref.ReferenceQueue
+import java.lang.ref.WeakReference
 
 open class MultiCache<T>(
     clazz: Class<T>,
@@ -64,16 +66,40 @@ open class MultiFlowCache<T>(
     cache: Cache = fCache,
 ) : MultiCache<T>(clazz, cache), IMultiFlowCache<T> {
 
-    private val _flows: MutableMap<String, MutableStateFlow<T?>> = hashMapOf()
+    private val _flows: MutableMap<String, WeakRef<MutableStateFlow<T?>>> = hashMapOf()
+    private val _refQueue = ReferenceQueue<MutableStateFlow<T?>>()
 
     final override suspend fun flow(key: String): Flow<T?> {
         return edit {
-            val flow = _flows.getOrPut(key) { MutableStateFlow(get(key)) }
+            val flow = _flows[key]?.get() ?: kotlin.run {
+                releaseRef()
+                MutableStateFlow(get(key)).also {
+                    _flows[key] = WeakRef(
+                        referent = it,
+                        queue = _refQueue,
+                        key = key,
+                    )
+                }
+            }
             flow.asStateFlow()
         }
     }
 
     override fun onCacheChanged(key: String, value: T?) {
-        _flows[key]?.value = value
+        _flows[key]?.get()?.value = value
     }
+
+    private fun releaseRef() {
+        while (true) {
+            val ref = _refQueue.poll() ?: return
+            check(ref is WeakRef)
+            _flows.remove(ref.key)
+        }
+    }
+
+    private class WeakRef<T>(
+        referent: T,
+        queue: ReferenceQueue<in T>,
+        val key: String,
+    ) : WeakReference<T>(referent, queue)
 }
