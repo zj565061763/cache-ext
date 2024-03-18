@@ -67,6 +67,7 @@ open class SingleFlowCache<T>(
     private var _flow: MutableStateFlow<T?>? = null
 
     final override suspend fun flow(): Flow<T?> {
+        _flow?.let { return it.asStateFlow() }
         return edit {
             val flow = _flow ?: MutableStateFlow(get()).also { _flow = it }
             flow.asStateFlow()
