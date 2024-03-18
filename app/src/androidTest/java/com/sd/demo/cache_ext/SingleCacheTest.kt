@@ -41,9 +41,8 @@ class SingleCacheTest {
 
     @Test
     fun testFlow() = runBlocking {
-        CacheUser.remove()
-
         CacheUser.flow().test {
+            CacheUser.remove()
             assertEquals(UserModel("default", "default"), awaitItem())
 
             CacheUser.put(UserModel("default", "default"))
@@ -54,6 +53,9 @@ class SingleCacheTest {
 
             assertEquals(UserModel("1", "1"), awaitItem())
             assertEquals(UserModel("2", "2"), awaitItem())
+
+            CacheUser.remove()
+            assertEquals(UserModel("default", "default"), awaitItem())
         }
     }
 }
