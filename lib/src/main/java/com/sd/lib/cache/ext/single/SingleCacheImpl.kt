@@ -73,7 +73,7 @@ open class SingleFlowCache<T>(
     final override suspend fun flow(): Flow<T?> {
         return edit {
             if (_flow.replayCache.isEmpty()) {
-                _flow.tryEmit(super.get())
+                _flow.tryEmit(get())
             }
             _flow.distinctUntilChanged()
         }
