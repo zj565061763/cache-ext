@@ -5,9 +5,13 @@ import com.sd.lib.cache.ext.CacheDispatcher
 import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -66,22 +70,47 @@ open class MultiFlowCache<T>(
     cache: Cache = fCache,
 ) : MultiCache<T>(clazz, cache), IMultiFlowCache<T> {
 
-    private val _flowStore = FMutableFlowStore<MutableSharedFlow<T?>>()
+    private val _scope = MainScope()
+    private val _flows: MutableMap<String, MutableSharedFlow<T?>> = hashMapOf()
 
     final override suspend fun flow(key: String): Flow<T?> {
-        return _flowStore.getOrPut(key) {
-            MutableSharedFlow<T?>(
-                replay = 1,
-                onBufferOverflow = BufferOverflow.DROP_OLDEST,
-            ).also { flow ->
-                MainScope().launch {
+        return edit {
+            val flow = _flows[key] ?: kotlin.run {
+                MutableSharedFlow<T?>(
+                    replay = 1,
+                    onBufferOverflow = BufferOverflow.DROP_OLDEST,
+                ).also { flow ->
+                    initFlow(key, flow)
                     flow.tryEmit(get(key))
                 }
             }
+            flow.distinctUntilChanged()
         }
     }
 
     override fun onCacheChanged(key: String, value: T?) {
-        _flowStore.get(key)?.tryEmit(value)
+        _flows[key]?.tryEmit(value)
+    }
+
+    private fun initFlow(key: Any, flow: MutableSharedFlow<*>) {
+        val job = _scope.launch {
+            delay(1000)
+            val context = currentCoroutineContext()
+            flow.subscriptionCount.collect { count ->
+                if (count > 0) {
+                    // active
+                } else {
+                    context.cancel()
+                }
+            }
+        }
+
+        job.invokeOnCompletion {
+            _scope.launch {
+                edit {
+                    _flows.remove(key)
+                }
+            }
+        }
     }
 }
