@@ -1,17 +1,15 @@
 [versions]
 
 androidCompileSdk = "34"
-androidMinSdk = "21"
-androidTargetSdk = "34"
 
-androidGradlePlugin = "8.2.2"
-kotlin = "1.9.22"
+androidGradlePlugin = "8.3.0"
+kotlin = "1.9.23"
 
 [libraries]
 
 androidx-appcompat = "androidx.appcompat:appcompat:1.6.1"
 
-kotlin-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+kotlin-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
 sd-cache = "com.github.zj565061763:cache:2.1.1"
 
 cash-turbine = "app.cash.turbine:turbine:1.0.0"
