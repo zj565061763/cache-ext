@@ -18,14 +18,23 @@ import org.junit.runner.RunWith
 class SingleCacheTest {
     @Test
     fun test() = runBlocking {
-        CacheUser.remove()
-
         UserModel("default", "default").let { user ->
+            CacheUser.remove()
             assertEquals(user, CacheUser.get())
         }
 
         UserModel("1", "1").let { user ->
             assertEquals(true, CacheUser.put(user))
+            assertEquals(user, CacheUser.get())
+        }
+
+        UserModel("2", "2").let { user ->
+            assertEquals(true, CacheUser.put(user))
+            assertEquals(user, CacheUser.get())
+        }
+
+        UserModel("default", "default").let { user ->
+            CacheUser.remove()
             assertEquals(user, CacheUser.get())
         }
     }
