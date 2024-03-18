@@ -4,10 +4,9 @@ import com.sd.lib.cache.Cache
 import com.sd.lib.cache.ext.CacheDispatcher
 import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 
 open class SingleCache<T>(
@@ -65,21 +64,16 @@ open class SingleFlowCache<T>(
     cache: Cache = fCache,
 ) : SingleCache<T>(clazz, cache), ISingleFlowCache<T> {
 
-    private val _flow: MutableSharedFlow<T?> = MutableSharedFlow(
-        replay = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
+    private var _flow: MutableStateFlow<T?>? = null
 
     final override suspend fun flow(): Flow<T?> {
         return edit {
-            if (_flow.replayCache.isEmpty()) {
-                _flow.tryEmit(get())
-            }
-            _flow.distinctUntilChanged()
+            val flow = _flow ?: MutableStateFlow(get()).also { _flow = it }
+            flow.asStateFlow()
         }
     }
 
     override fun onCacheChanged(value: T?) {
-        _flow.tryEmit(value)
+        _flow?.value = value
     }
 }
