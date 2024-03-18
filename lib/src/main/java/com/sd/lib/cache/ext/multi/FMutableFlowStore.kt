@@ -35,15 +35,6 @@ internal class FMutableFlowStore<T : MutableSharedFlow<*>> {
         }
     }
 
-    /**
-     * 当前保存的[MutableSharedFlow]数量
-     */
-    fun size(): Int {
-        synchronized(this@FMutableFlowStore) {
-            return _holder.size
-        }
-    }
-
     private fun initFlow(key: Any, flow: T) {
         _scope.launch {
             delay(1000)
