@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btn_change_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="change user"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btn_remove_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="remove user"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="register"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btn_unregister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="unregister"
+        android:textAllCaps="false" />
+
+</LinearLayout>

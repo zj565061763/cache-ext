@@ -15,6 +15,9 @@ class MainActivity : AppCompatActivity() {
         _binding.btnSampleSingleCache.setOnClickListener {
             startActivity(Intent(this, SampleSingleCache::class.java))
         }
+        _binding.btnSampleMultiCache.setOnClickListener {
+            startActivity(Intent(this, SampleMultiCache::class.java))
+        }
     }
 }
 
