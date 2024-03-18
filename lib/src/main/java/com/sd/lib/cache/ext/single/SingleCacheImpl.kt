@@ -1,16 +1,14 @@
 package com.sd.lib.cache.ext.single
 
 import com.sd.lib.cache.Cache
-import com.sd.lib.cache.FCache
 import com.sd.lib.cache.ext.cacheEdit
 import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 abstract class SingleCache<T>(
@@ -62,17 +60,18 @@ abstract class SingleCache<T>(
 
 abstract class SingleFlowCache<T>(
     clazz: Class<T>,
-    cache: Cache = FCache.get(),
+    cache: Cache = fCache,
 ) : SingleCache<T>(clazz, cache), ISingleFlowCache<T> {
 
-    private val _flow: MutableSharedFlow<T?> = MutableSharedFlow(
-        replay = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
+    private val _flow: MutableStateFlow<T?> = MutableStateFlow(null)
 
-    private val _readonlyFlow: SharedFlow<T?> by lazy {
-        initFlow()
-        _flow.asSharedFlow()
+    private val _readonlyFlow: StateFlow<T?> by lazy {
+        MainScope().launch {
+            if (_flow.value == null) {
+                _flow.value = super.get()
+            }
+        }
+        _flow.asStateFlow()
     }
 
     final override fun flow(): Flow<T?> {
@@ -80,16 +79,6 @@ abstract class SingleFlowCache<T>(
     }
 
     override fun onCacheChanged(value: T?) {
-        _flow.tryEmit(value)
-    }
-
-    private fun initFlow() {
-        if (_flow.replayCache.isEmpty()) {
-            MainScope().launch {
-                if (_flow.replayCache.isEmpty()) {
-                    _flow.tryEmit(super.get())
-                }
-            }
-        }
+        _flow.value = value
     }
 }
