@@ -45,10 +45,8 @@ abstract class SingleCache<T>(
         }
     }
 
-    override suspend fun <R> edit(block: suspend ISingleCache<T>.() -> R): R {
-        return cacheEdit {
-            block()
-        }
+    override suspend fun <R> edit(block: suspend () -> R): R {
+        return cacheEdit { block() }
     }
 
     /**

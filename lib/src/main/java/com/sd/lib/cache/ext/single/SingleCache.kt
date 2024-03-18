@@ -25,7 +25,7 @@ interface ISingleCache<T> {
     /**
      * 编辑，[block]为原子性操作
      */
-    suspend fun <R> edit(block: suspend ISingleCache<T>.() -> R): R
+    suspend fun <R> edit(block: suspend () -> R): R
 }
 
 interface ISingleFlowCache<T> : ISingleCache<T> {
