@@ -40,7 +40,6 @@ class SingleCacheTest {
             CacheUser.remove()
             assertEquals(UserModel("default", "default"), awaitItem())
 
-            CacheUser.put(UserModel("default", "default"))
             CacheUser.put(UserModel("1", "1"))
             CacheUser.put(UserModel("1", "1"))
             CacheUser.put(UserModel("2", "2"))
