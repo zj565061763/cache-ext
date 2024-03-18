@@ -1,4 +1,4 @@
-package com.sd.lib.cache.ext
+package com.sd.lib.cache.ext.multi
 
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
