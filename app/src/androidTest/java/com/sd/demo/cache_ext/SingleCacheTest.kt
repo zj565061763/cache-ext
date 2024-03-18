@@ -36,6 +36,15 @@ class SingleCacheTest {
 
         CacheUser.flow().test {
             assertEquals(UserModel("default", "default"), awaitItem())
+
+            CacheUser.put(UserModel("default", "default"))
+            CacheUser.put(UserModel("1", "1"))
+            CacheUser.put(UserModel("1", "1"))
+            CacheUser.put(UserModel("2", "2"))
+            CacheUser.put(UserModel("2", "2"))
+
+            assertEquals(UserModel("1", "1"), awaitItem())
+            assertEquals(UserModel("2", "2"), awaitItem())
         }
     }
 }

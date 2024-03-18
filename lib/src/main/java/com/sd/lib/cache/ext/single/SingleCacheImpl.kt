@@ -8,6 +8,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withContext
 
 open class SingleCache<T>(
@@ -69,7 +70,7 @@ open class SingleFlowCache<T>(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
-    private val _readonlyFlow: Flow<T?> = _flow.asSharedFlow()
+    private val _readonlyFlow: Flow<T?> = _flow.asSharedFlow().distinctUntilChanged()
 
     final override suspend fun flow(): Flow<T?> {
         return edit {
