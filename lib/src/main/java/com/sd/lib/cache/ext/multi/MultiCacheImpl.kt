@@ -69,7 +69,7 @@ open class MultiFlowCache<T>(
 
     final override suspend fun flow(key: String): Flow<T?> {
         return edit {
-            val flow = _flows[key] ?: kotlin.run {
+            val flow = _flows.getOrPut(key) {
                 MutableSharedFlow<T?>(
                     replay = 1,
                     onBufferOverflow = BufferOverflow.DROP_OLDEST,

@@ -37,20 +37,20 @@ class MultiCacheTest {
 
     @Test
     fun multiCacheFlowTest() = runBlocking {
-        val defaultUser = UserModel("default", "default")
-        assertEquals(defaultUser, CacheUsers.get("default"))
-
-        UserModel("1", "1").let { user ->
-            assertEquals(true, CacheUsers.put("1", user))
-            assertEquals(user, CacheUsers.get("1"))
-            CacheUsers.flow("1").test {
-                assertEquals(user, awaitItem())
-            }
+        CacheUsers.flow("default").test {
+            CacheUsers.remove("default")
+            assertEquals(UserModel("default", "default"), awaitItem())
         }
 
-        CacheUsers.remove("1")
-        assertEquals(null, CacheUsers.get("1"))
         CacheUsers.flow("1").test {
+            CacheUsers.remove("1")
+            assertEquals(null, awaitItem())
+
+            CacheUsers.put("1", UserModel("1", "1"))
+            CacheUsers.put("1", UserModel("1", "1"))
+            assertEquals(UserModel("1", "1"), awaitItem())
+
+            CacheUsers.remove("1")
             assertEquals(null, awaitItem())
         }
     }
