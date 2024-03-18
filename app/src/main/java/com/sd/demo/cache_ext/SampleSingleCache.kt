@@ -17,10 +17,10 @@ class SampleSingleCache : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
-        _binding.btnChange.setOnClickListener {
+        _binding.btnChangeUser.setOnClickListener {
             changeUser()
         }
-        _binding.btnRemove.setOnClickListener {
+        _binding.btnRemoveUser.setOnClickListener {
             removeUser()
         }
         _binding.btnRegister.setOnClickListener {
