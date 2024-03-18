@@ -1,8 +1,8 @@
 package com.sd.lib.cache.ext.multi
 
 import com.sd.lib.cache.Cache
+import com.sd.lib.cache.ext.CacheDispatcher
 import com.sd.lib.cache.ext.FMutableFlowStore
-import com.sd.lib.cache.ext.editCache
 import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -10,6 +10,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 open class MultiCache<T>(
     clazz: Class<T>,
@@ -45,9 +46,7 @@ open class MultiCache<T>(
     }
 
     override suspend fun <R> edit(block: suspend IMultiCache<T>.() -> R): R {
-        return editCache {
-            block()
-        }
+        return withContext(CacheDispatcher) { block() }
     }
 
     final override fun flowOf(key: String): Flow<T?> {

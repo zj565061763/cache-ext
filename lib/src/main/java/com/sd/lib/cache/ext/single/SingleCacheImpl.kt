@@ -1,7 +1,7 @@
 package com.sd.lib.cache.ext.single
 
 import com.sd.lib.cache.Cache
-import com.sd.lib.cache.ext.editCache
+import com.sd.lib.cache.ext.CacheDispatcher
 import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 abstract class SingleCache<T>(
     clazz: Class<T>,
@@ -44,7 +45,7 @@ abstract class SingleCache<T>(
     }
 
     override suspend fun <R> edit(block: suspend () -> R): R {
-        return editCache { block() }
+        return withContext(CacheDispatcher) { block() }
     }
 
     /**
