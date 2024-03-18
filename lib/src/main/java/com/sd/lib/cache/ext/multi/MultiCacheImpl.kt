@@ -56,7 +56,7 @@ open class MultiCache<T>(
     protected open fun onCacheChanged(key: String, value: T?) = Unit
 
     /**
-     * 如果[get]方法未找到缓存，会尝试调用此方法创建缓存返回，[Dispatchers.IO]上执行
+     * 创建默认缓存对象，会尝试调用此方法创建缓存返回，[Dispatchers.IO]上执行
      */
     protected open fun create(key: String): T? = null
 }

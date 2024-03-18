@@ -55,7 +55,7 @@ open class SingleCache<T>(
     protected open fun onCacheChanged(value: T?) = Unit
 
     /**
-     * 如果[get]方法未找到缓存，会尝试调用此方法创建缓存返回，[Dispatchers.IO]上执行
+     * 创建默认缓存对象，[Dispatchers.IO]上执行
      */
     protected open fun create(): T? = null
 }
