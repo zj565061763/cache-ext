@@ -42,10 +42,10 @@ class SingleCacheTest {
 
             CacheUser.put(UserModel("1", "1"))
             CacheUser.put(UserModel("1", "1"))
-            CacheUser.put(UserModel("2", "2"))
-            CacheUser.put(UserModel("2", "2"))
-
             assertEquals(UserModel("1", "1"), awaitItem())
+
+            CacheUser.put(UserModel("2", "2"))
+            CacheUser.put(UserModel("2", "2"))
             assertEquals(UserModel("2", "2"), awaitItem())
 
             CacheUser.remove()
