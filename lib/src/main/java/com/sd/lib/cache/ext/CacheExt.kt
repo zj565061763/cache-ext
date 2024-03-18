@@ -7,6 +7,6 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalCoroutinesApi::class)
 private val CacheDispatcher = Dispatchers.IO.limitedParallelism(1)
 
-internal suspend fun <T> cacheEdit(block: suspend () -> T): T {
+internal suspend fun <T> editCache(block: suspend () -> T): T {
     return withContext(CacheDispatcher) { block() }
 }

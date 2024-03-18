@@ -2,7 +2,7 @@ package com.sd.lib.cache.ext.multi
 
 import com.sd.lib.cache.Cache
 import com.sd.lib.cache.ext.FMutableFlowStore
-import com.sd.lib.cache.ext.cacheEdit
+import com.sd.lib.cache.ext.editCache
 import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -45,7 +45,7 @@ open class MultiCache<T>(
     }
 
     override suspend fun <R> edit(block: suspend IMultiCache<T>.() -> R): R {
-        return cacheEdit {
+        return editCache {
             block()
         }
     }
