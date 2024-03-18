@@ -73,9 +73,9 @@ open class MultiFlowCache<T>(
         return edit {
             val flow = _flows[key]?.get() ?: kotlin.run {
                 releaseRef()
-                MutableStateFlow(get(key)).also {
+                MutableStateFlow(get(key)).also { instance ->
                     _flows[key] = WeakRef(
-                        referent = it,
+                        referent = instance,
                         queue = _refQueue,
                         key = key,
                     )
