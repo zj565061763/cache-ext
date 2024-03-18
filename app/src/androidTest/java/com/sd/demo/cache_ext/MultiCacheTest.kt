@@ -37,13 +37,13 @@ class MultiCacheTest {
 
     @Test
     fun multiCacheFlowTest() = runBlocking {
+        CacheUsers.remove("default")
         CacheUsers.flow("default").test {
-            CacheUsers.remove("default")
             assertEquals(UserModel("default", "default"), awaitItem())
         }
 
+        CacheUsers.remove("1")
         CacheUsers.flow("1").test {
-            CacheUsers.remove("1")
             assertEquals(null, awaitItem())
 
             CacheUsers.put("1", UserModel("1", "1"))
