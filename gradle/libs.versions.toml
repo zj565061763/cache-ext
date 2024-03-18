@@ -10,7 +10,7 @@ kotlin = "1.9.23"
 androidx-appcompat = "androidx.appcompat:appcompat:1.6.1"
 
 kotlin-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
-sd-cache = "com.github.zj565061763:cache:2.1.1"
+sd-cache = "com.github.zj565061763:cache:2.5.0-beta01"
 
 cash-turbine = "app.cash.turbine:turbine:1.0.0"
 

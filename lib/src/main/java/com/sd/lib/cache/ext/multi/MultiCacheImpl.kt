@@ -1,9 +1,9 @@
 package com.sd.lib.cache.ext.multi
 
 import com.sd.lib.cache.Cache
-import com.sd.lib.cache.FCache
 import com.sd.lib.cache.ext.FMutableFlowStore
 import com.sd.lib.cache.ext.cacheEdit
+import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -13,10 +13,10 @@ import kotlinx.coroutines.launch
 
 open class MultiCache<T>(
     clazz: Class<T>,
-    cache: Cache = FCache.get(),
+    cache: Cache = fCache,
 ) : IMultiCache<T> {
 
-    private val _cache = cache.cObjects(clazz)
+    private val _cache = cache.multi(clazz)
     private val _flowStore = FMutableFlowStore<MutableSharedFlow<T?>>()
 
     override suspend fun put(key: String, value: T?): Boolean {

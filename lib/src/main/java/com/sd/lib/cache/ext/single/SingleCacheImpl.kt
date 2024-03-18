@@ -3,6 +3,7 @@ package com.sd.lib.cache.ext.single
 import com.sd.lib.cache.Cache
 import com.sd.lib.cache.FCache
 import com.sd.lib.cache.ext.cacheEdit
+import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -14,10 +15,10 @@ import kotlinx.coroutines.launch
 
 abstract class SingleCache<T>(
     clazz: Class<T>,
-    cache: Cache = FCache.get(),
+    cache: Cache = fCache,
 ) : ISingleCache<T> {
 
-    private val _cache = cache.cObject(clazz)
+    private val _cache = cache.single(clazz)
 
     override suspend fun put(value: T?): Boolean {
         return edit {
