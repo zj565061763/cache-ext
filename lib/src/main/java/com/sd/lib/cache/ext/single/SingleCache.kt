@@ -29,5 +29,5 @@ interface ISingleCache<T> {
 }
 
 interface ISingleFlowCache<T> : ISingleCache<T> {
-    fun flow(): Flow<T?>
+    suspend fun flow(): Flow<T?>
 }

@@ -4,12 +4,10 @@ import com.sd.lib.cache.Cache
 import com.sd.lib.cache.ext.CacheDispatcher
 import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 open class SingleCache<T>(
@@ -40,7 +38,9 @@ open class SingleCache<T>(
     override suspend fun remove() {
         edit {
             _cache.remove()
-            onCacheChanged(null)
+            if (get() == null) {
+                onCacheChanged(null)
+            }
         }
     }
 
@@ -69,24 +69,18 @@ open class SingleFlowCache<T>(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
-    private val _readonlyFlow: Flow<T?> by lazy {
-        initFlow()
-        _flow.asSharedFlow()
-    }
+    private val _readonlyFlow: Flow<T?> = _flow.asSharedFlow()
 
-    final override fun flow(): Flow<T?> {
-        return _readonlyFlow
+    final override suspend fun flow(): Flow<T?> {
+        return edit {
+            if (_flow.replayCache.isEmpty()) {
+                _flow.tryEmit(super.get())
+            }
+            _readonlyFlow
+        }
     }
 
     override fun onCacheChanged(value: T?) {
         _flow.tryEmit(value)
-    }
-
-    private fun initFlow() {
-        MainScope().launch {
-            if (_flow.replayCache.isEmpty()) {
-                _flow.tryEmit(super.get())
-            }
-        }
     }
 }
