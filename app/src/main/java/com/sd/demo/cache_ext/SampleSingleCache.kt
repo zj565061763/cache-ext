@@ -18,27 +18,44 @@ class SampleSingleCache : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
         _binding.btnChange.setOnClickListener {
-            _scope.launch {
-                _count++
-                CacheUser.put(UserModel(_count.toString(), _count.toString()))
-            }
+            changeUser()
         }
         _binding.btnRemove.setOnClickListener {
-            _scope.launch {
-                CacheUser.remove()
-            }
+            removeUser()
         }
-
         _binding.btnRegister.setOnClickListener {
-            _scope.cancel()
-            _scope.launch {
-                CacheUser.flow().collect {
-                    _binding.tvUser.text = it.toString()
-                }
-            }
+            register()
         }
         _binding.btnUnregister.setOnClickListener {
-            _scope.cancel()
+            unregister()
         }
+
+        register()
+    }
+
+    private fun changeUser() {
+        _scope.launch {
+            _count++
+            CacheUser.put(UserModel(_count.toString(), _count.toString()))
+        }
+    }
+
+    private fun removeUser() {
+        _scope.launch {
+            CacheUser.remove()
+        }
+    }
+
+    private fun register() {
+        unregister()
+        _scope.launch {
+            CacheUser.flow().collect {
+                _binding.tvUser.text = it.toString()
+            }
+        }
+    }
+
+    private fun unregister() {
+        _scope.cancel()
     }
 }
