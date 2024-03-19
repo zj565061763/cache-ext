@@ -35,11 +35,8 @@ open class SingleCache<T>(
     override suspend fun remove() {
         edit {
             _cache.remove()
-            val create = create()
-            if (create == null) {
+            if (get() == null) {
                 onCacheChanged(null)
-            } else {
-                put(create)
             }
         }
     }
