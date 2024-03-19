@@ -72,13 +72,13 @@ open class MultiFlowCache<T>(
     final override suspend fun flow(key: String): Flow<T?> {
         return edit {
             val flow = _flows[key]?.get() ?: kotlin.run {
+                releaseRef()
                 MutableStateFlow(get(key)).also { instance ->
                     _flows[key] = WeakRef(
                         referent = instance,
                         queue = _refQueue,
                         key = key,
                     )
-                    releaseRef()
                 }
             }
             flow.asStateFlow()
