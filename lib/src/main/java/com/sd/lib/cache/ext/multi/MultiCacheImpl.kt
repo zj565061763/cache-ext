@@ -37,11 +37,8 @@ open class MultiCache<T>(
     override suspend fun remove(key: String) {
         edit {
             _cache.remove(key)
-            val create = create(key)
-            if (create == null) {
+            if (get(key) == null) {
                 onCacheChanged(key, null)
-            } else {
-                put(key, create)
             }
         }
     }
