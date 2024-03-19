@@ -66,9 +66,10 @@ open class SingleFlowCache<T>(
     final override suspend fun flow(): Flow<T?> {
         _flow?.let { return it.asStateFlow() }
         return edit {
-            val flow = _flow ?: MutableStateFlow(get()).also { _flow = it }
-            flow.asStateFlow()
-        }
+            _flow ?: MutableStateFlow(get()).also {
+                _flow = it
+            }
+        }.asStateFlow()
     }
 
     override fun onCacheChanged(value: T?) {
