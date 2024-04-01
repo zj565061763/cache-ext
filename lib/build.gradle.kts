@@ -32,7 +32,7 @@ kotlin {
 
 dependencies {
     api(libs.sd.cache)
-    api(libs.kotlin.coroutines)
+    api(libs.kotlinx.coroutines)
 }
 
 publishing {
