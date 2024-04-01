@@ -1,7 +1,6 @@
-package com.sd.lib.cache.ext.multi
+package com.sd.lib.cache.ext
 
 import com.sd.lib.cache.Cache
-import com.sd.lib.cache.ext.CacheDispatcher
 import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -11,18 +10,51 @@ import kotlinx.coroutines.withContext
 import java.lang.ref.ReferenceQueue
 import java.lang.ref.WeakReference
 
-open class MultiCache<T>(
+/**
+ * 多缓存管理接口，所有方法均在[Dispatchers.IO]上执行，并发为1
+ */
+interface MultiCache<T> {
+    /**
+     * 保存
+     */
+    suspend fun put(key: String, value: T?): Boolean
+
+    /**
+     * 获取
+     */
+    suspend fun get(key: String): T?
+
+    /**
+     * 删除
+     */
+    suspend fun remove(key: String)
+
+    /**
+     * 编辑，[block]为原子性操作
+     */
+    suspend fun <R> edit(block: suspend () -> R): R
+
+    /**
+     * [key]对应的[Flow]
+     */
+    suspend fun flow(key: String): Flow<T?>
+}
+
+open class FMultiCache<T>(
     clazz: Class<T>,
     cache: Cache = fCache,
-) : IMultiCache<T> {
+) : MultiCache<T> {
 
     private val _cache = cache.multi(clazz)
+
+    private val _flows: MutableMap<String, WeakRef<MutableStateFlow<T?>>> = hashMapOf()
+    private val _refQueue = ReferenceQueue<MutableStateFlow<T?>>()
 
     override suspend fun put(key: String, value: T?): Boolean {
         return edit {
             _cache.put(key, value).also { put ->
                 if (put) {
-                    onCacheChanged(key, value)
+                    notifyCacheChanged(key, value)
                 }
             }
         }
@@ -38,35 +70,16 @@ open class MultiCache<T>(
         edit {
             _cache.remove(key)
             if (get(key) == null) {
-                onCacheChanged(key, null)
+                notifyCacheChanged(key, null)
             }
         }
     }
 
-    override suspend fun <R> edit(block: suspend () -> R): R {
+    final override suspend fun <R> edit(block: suspend () -> R): R {
         return withContext(CacheDispatcher) { block() }
     }
 
-    /**
-     * 缓存对象变化回调，[Dispatchers.IO]上执行
-     */
-    protected open fun onCacheChanged(key: String, value: T?) = Unit
-
-    /**
-     * 创建默认缓存对象，[Dispatchers.IO]上执行
-     */
-    protected open fun create(key: String): T? = null
-}
-
-open class MultiFlowCache<T>(
-    clazz: Class<T>,
-    cache: Cache = fCache,
-) : MultiCache<T>(clazz, cache), IMultiFlowCache<T> {
-
-    private val _flows: MutableMap<String, WeakRef<MutableStateFlow<T?>>> = hashMapOf()
-    private val _refQueue = ReferenceQueue<MutableStateFlow<T?>>()
-
-    final override suspend fun flow(key: String): Flow<T?> {
+    override suspend fun flow(key: String): Flow<T?> {
         return edit {
             releaseRef()
             _flows[key]?.get() ?: MutableStateFlow(get(key)).also { instance ->
@@ -79,7 +92,7 @@ open class MultiFlowCache<T>(
         }.asStateFlow()
     }
 
-    override fun onCacheChanged(key: String, value: T?) {
+    private fun notifyCacheChanged(key: String, value: T?) {
         _flows[key]?.get()?.value = value
     }
 
@@ -96,4 +109,9 @@ open class MultiFlowCache<T>(
         queue: ReferenceQueue<in T>,
         val key: String,
     ) : WeakReference<T>(referent, queue)
+
+    /**
+     * 创建默认缓存对象，[Dispatchers.IO]上执行
+     */
+    protected open fun create(key: String): T? = null
 }
