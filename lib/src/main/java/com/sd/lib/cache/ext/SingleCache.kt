@@ -1,7 +1,6 @@
-package com.sd.lib.cache.ext.single
+package com.sd.lib.cache.ext
 
 import com.sd.lib.cache.Cache
-import com.sd.lib.cache.ext.CacheDispatcher
 import com.sd.lib.cache.fCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
