@@ -47,9 +47,6 @@ open class FMultiCache<T>(
 
     private val _cache = cache.multi(clazz)
 
-    private val _flows: MutableMap<String, WeakRef<MutableStateFlow<T?>>> = hashMapOf()
-    private val _refQueue = ReferenceQueue<MutableStateFlow<T?>>()
-
     override suspend fun put(key: String, value: T?): Boolean {
         return edit {
             _cache.put(key, value).also { put ->
@@ -78,6 +75,9 @@ open class FMultiCache<T>(
     final override suspend fun <R> edit(block: suspend () -> R): R {
         return withContext(CacheDispatcher) { block() }
     }
+
+    private val _flows: MutableMap<String, WeakRef<MutableStateFlow<T?>>> = hashMapOf()
+    private val _refQueue = ReferenceQueue<MutableStateFlow<T?>>()
 
     override suspend fun flow(key: String): Flow<T?> {
         return edit {
