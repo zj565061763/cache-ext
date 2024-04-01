@@ -41,7 +41,6 @@ open class FSingleCache<T>(
 ) : SingleCache<T> {
 
     private val _cache = cache.single(clazz)
-    private var _flow: MutableStateFlow<T?>? = null
 
     override suspend fun put(value: T?): Boolean {
         return edit {
@@ -71,6 +70,8 @@ open class FSingleCache<T>(
     final override suspend fun <R> edit(block: suspend () -> R): R {
         return withContext(CacheDispatcher) { block() }
     }
+
+    private var _flow: MutableStateFlow<T?>? = null
 
     override suspend fun flow(): Flow<T?> {
         val flow = _flow ?: edit {
