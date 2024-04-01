@@ -74,12 +74,12 @@ open class FSingleCache<T>(
     }
 
     override suspend fun flow(): Flow<T?> {
-        _flow?.let { return it.asStateFlow() }
-        return edit {
+        val flow = _flow ?: edit {
             _flow ?: MutableStateFlow(get()).also {
                 _flow = it
             }
-        }.asStateFlow()
+        }
+        return flow.asStateFlow()
     }
 
     private fun notifyCacheChanged(value: T?) {
