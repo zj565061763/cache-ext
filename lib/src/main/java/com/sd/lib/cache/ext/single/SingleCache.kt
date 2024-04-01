@@ -4,9 +4,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
 /**
- * 单缓存管理接口，所有方法均在[Dispatchers.IO]上执行
+ * 单缓存管理接口，所有方法均在[Dispatchers.IO]执行，并发为1
  */
-interface ISingleCache<T> {
+interface SingleCache<T> {
     /**
      * 保存
      */
@@ -26,8 +26,6 @@ interface ISingleCache<T> {
      * 编辑，[block]为原子性操作
      */
     suspend fun <R> edit(block: suspend () -> R): R
-}
 
-interface ISingleFlowCache<T> : ISingleCache<T> {
     suspend fun flow(): Flow<T?>
 }

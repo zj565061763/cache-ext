@@ -9,18 +9,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 
-open class SingleCache<T>(
+open class FSingleCache<T>(
     clazz: Class<T>,
     cache: Cache = fCache,
-) : ISingleCache<T> {
+) : SingleCache<T> {
 
     private val _cache = cache.single(clazz)
+    private var _flow: MutableStateFlow<T?>? = null
 
     override suspend fun put(value: T?): Boolean {
         return edit {
             _cache.put(value).also { put ->
                 if (put) {
-                    onCacheChanged(value)
+                    notifyCacheChanged(value)
                 }
             }
         }
@@ -36,7 +37,7 @@ open class SingleCache<T>(
         edit {
             _cache.remove()
             if (get() == null) {
-                onCacheChanged(null)
+                notifyCacheChanged(null)
             }
         }
     }
@@ -45,25 +46,7 @@ open class SingleCache<T>(
         return withContext(CacheDispatcher) { block() }
     }
 
-    /**
-     * 缓存对象变化回调，[Dispatchers.IO]上执行
-     */
-    protected open fun onCacheChanged(value: T?) = Unit
-
-    /**
-     * 创建默认缓存对象，[Dispatchers.IO]上执行
-     */
-    protected open fun create(): T? = null
-}
-
-open class SingleFlowCache<T>(
-    clazz: Class<T>,
-    cache: Cache = fCache,
-) : SingleCache<T>(clazz, cache), ISingleFlowCache<T> {
-
-    private var _flow: MutableStateFlow<T?>? = null
-
-    final override suspend fun flow(): Flow<T?> {
+    override suspend fun flow(): Flow<T?> {
         _flow?.let { return it.asStateFlow() }
         return edit {
             _flow ?: MutableStateFlow(get()).also {
@@ -72,7 +55,12 @@ open class SingleFlowCache<T>(
         }.asStateFlow()
     }
 
-    override fun onCacheChanged(value: T?) {
+    private fun notifyCacheChanged(value: T?) {
         _flow?.value = value
     }
+
+    /**
+     * 创建默认缓存对象，[Dispatchers.IO]上执行
+     */
+    protected open fun create(): T? = null
 }

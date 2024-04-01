@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MultiCacheTest {
     @Test
-    fun test() = runBlocking {
+    fun test(): Unit = runBlocking {
         UserModel("default", "default").let { user ->
             CacheUsers.remove("default")
             assertEquals(user, CacheUsers.get("default"))
@@ -36,7 +36,7 @@ class MultiCacheTest {
     }
 
     @Test
-    fun multiCacheFlowTest() = runBlocking {
+    fun multiCacheFlowTest(): Unit = runBlocking {
         CacheUsers.remove("default")
         CacheUsers.flow("default").test {
             assertEquals(UserModel("default", "default"), awaitItem())

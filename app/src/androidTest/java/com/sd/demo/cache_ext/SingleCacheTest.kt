@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SingleCacheTest {
     @Test
-    fun test() = runBlocking {
+    fun test(): Unit = runBlocking {
         UserModel("default", "default").let { user ->
             CacheUser.remove()
             assertEquals(user, CacheUser.get())
@@ -35,7 +35,7 @@ class SingleCacheTest {
     }
 
     @Test
-    fun testFlow() = runBlocking {
+    fun testFlow(): Unit = runBlocking {
         CacheUser.remove()
         CacheUser.flow().test {
             assertEquals(UserModel("default", "default"), awaitItem())
