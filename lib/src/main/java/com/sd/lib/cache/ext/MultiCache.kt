@@ -1,7 +1,7 @@
 package com.sd.lib.cache.ext
 
 import com.sd.lib.cache.Cache
-import com.sd.lib.cache.fCache
+import com.sd.lib.cache.FCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +42,7 @@ interface MultiCache<T> {
 
 open class FMultiCache<T>(
     clazz: Class<T>,
-    cache: Cache = fCache,
+    cache: Cache = FCache.getDefault(),
 ) : MultiCache<T> {
 
     private val _cache = cache.multi(clazz)
