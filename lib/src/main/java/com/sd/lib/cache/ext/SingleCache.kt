@@ -32,6 +32,9 @@ interface SingleCache<T> {
      */
     suspend fun <R> edit(block: suspend () -> R): R
 
+    /**
+     * 缓存对应的[Flow]
+     */
     suspend fun flow(): Flow<T?>
 }
 
