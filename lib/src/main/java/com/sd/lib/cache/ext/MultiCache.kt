@@ -76,7 +76,7 @@ open class FMultiCache<T>(
         return withContext(CacheDispatcher) { block() }
     }
 
-    private val _flows: MutableMap<String, WeakRef<MutableStateFlow<T?>>> = hashMapOf()
+    private val _flows: MutableMap<String, WeakRef<MutableStateFlow<T?>>> = mutableMapOf()
     private val _refQueue = ReferenceQueue<MutableStateFlow<T?>>()
 
     override suspend fun flow(key: String): Flow<T?> {
