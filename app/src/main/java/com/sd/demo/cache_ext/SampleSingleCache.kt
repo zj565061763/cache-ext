@@ -6,7 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import com.sd.demo.cache_ext.cache.CacheUser
 import com.sd.demo.cache_ext.cache.UserModel
 import com.sd.demo.cache_ext.databinding.SampleSingleCacheBinding
-import com.sd.lib.coroutine.FScope
+import com.sd.lib.coroutines.FScope
 
 class SampleSingleCache : AppCompatActivity() {
     private val _binding by lazy { SampleSingleCacheBinding.inflate(layoutInflater) }
